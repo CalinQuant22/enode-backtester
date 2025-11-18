@@ -1,0 +1,11 @@
+numpy
+pandas
+matplotlib
+seaborn
+scipy
+statsmodels
+enode-quant
+
+# Optional but recommended for working with the notebook itself:
+jupyterlab
+ipykernel
