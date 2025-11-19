@@ -65,7 +65,7 @@ class BacktestResult:
     
     def dashboard(self, port: int = 8050, save: bool = False):
         """Launch interactive dashboard."""
-        if not _DASHBOARD_AVAILABLE:
+        if not _check_dashboard():
             raise ImportError("Dashboard requires: pip install dash plotly dash-bootstrap-components")
         
         if save:
@@ -85,14 +85,23 @@ class BacktestResult:
         """Delegate to portfolio for backward compatibility."""
         return getattr(self.portfolio, name)
 
-# Optional dashboard imports (requires dash)
-try:
-    from .dashboard import create_app, launch_dashboard
-    _DASHBOARD_AVAILABLE = True
-except ImportError:
-    _DASHBOARD_AVAILABLE = False
-    create_app = None
-    launch_dashboard = None
+# Dashboard availability flag (lazy import)
+_DASHBOARD_AVAILABLE = None
+create_app = None
+launch_dashboard = None
+
+def _check_dashboard():
+    """Lazy check for dashboard availability."""
+    global _DASHBOARD_AVAILABLE, create_app, launch_dashboard
+    if _DASHBOARD_AVAILABLE is None:
+        try:
+            from .dashboard import create_app, launch_dashboard
+            _DASHBOARD_AVAILABLE = True
+        except ImportError:
+            _DASHBOARD_AVAILABLE = False
+            create_app = None
+            launch_dashboard = None
+    return _DASHBOARD_AVAILABLE
 from .data import DataFrameDataHandler
 from .engine import BacktestEngine
 from .execution import (
@@ -217,6 +226,9 @@ def run_backtest(
     print("--- Backtest Complete. Returning results. ---")
     return BacktestResult(final_portfolio)
 
+
+# Version
+__version__ = "0.1.3"
 
 # Public API exports
 __all__ = [
