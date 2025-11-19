@@ -71,3 +71,22 @@ autodoc_mock_imports = [
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
+
+# Logo configuration
+html_logo = "_static/logofinalpng.png"
+html_theme_options = {
+    'logo_only': False,
+    'display_version': True,
+    'prev_next_buttons_location': 'bottom',
+    'style_external_links': False,
+    'collapse_navigation': True,
+    'sticky_navigation': True,
+    'navigation_depth': 4,
+    'includehidden': True,
+    'titles_only': False
+}
+
+# Custom CSS for logo styling
+html_css_files = [
+    'custom.css',
+]

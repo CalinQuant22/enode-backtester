@@ -14,7 +14,12 @@ pio.templates.default = "plotly_dark"
 def create_app(results_path: str = None, portfolio=None, metrics=None, monte_carlo=None):
     """Create and configure Dash app."""
     
-    app = dash.Dash(__name__, external_stylesheets=[
+    import os
+    assets_path = os.path.join(os.path.dirname(__file__), 'assets')
+    
+    app = dash.Dash(__name__, 
+                    assets_folder=assets_path,
+                    external_stylesheets=[
         "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css",
         "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     ])

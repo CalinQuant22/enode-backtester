@@ -1,0 +1,89 @@
+/* Custom CSS for Enode Backtester Documentation */
+
+/* Logo styling with black background */
+.wy-side-nav-search .wy-dropdown > a img.logo,
+.wy-side-nav-search > a img.logo {
+    background-color: #000000 !important;
+    padding: 15px 20px !important;
+    border-radius: 15px !important;
+    border: 3px solid #444444 !important;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.6) !important;
+    margin-bottom: 15px !important;
+    max-width: 220px !important;
+    height: auto !important;
+    transform: scale(1.15) !important;
+}
+
+/* Ensure logo container has proper styling */
+.wy-side-nav-search {
+    background-color: #2980B9 !important;
+    padding: 20px !important;
+}
+
+/* Logo hover effect */
+.wy-side-nav-search .wy-dropdown > a img.logo:hover,
+.wy-side-nav-search > a img.logo:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.6) !important;
+}
+
+/* Adjust text spacing after logo */
+.wy-side-nav-search .wy-dropdown > a,
+.wy-side-nav-search > a {
+    display: block !important;
+    text-align: center !important;
+}
+
+/* Custom styling for better visual hierarchy */
+.rst-content .section > h1 {
+    border-bottom: 3px solid #2980B9;
+    padding-bottom: 10px;
+}
+
+/* Enhanced code blocks */
+.rst-content .highlight {
+    border-left: 4px solid #2980B9;
+    margin: 1em 0;
+}
+
+/* Math formula styling */
+.rst-content .math {
+    background-color: #f8f9fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    border: 1px solid #e9ecef;
+}
+
+/* Table styling improvements */
+.rst-content table.docutils {
+    border: 1px solid #e1e4e5;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.rst-content table.docutils th {
+    background-color: #2980B9;
+    color: white;
+    font-weight: 600;
+}
+
+/* Note and warning boxes */
+.rst-content .note {
+    border-left: 4px solid #2980B9;
+    background-color: #f0f7ff;
+}
+
+.rst-content .warning {
+    border-left: 4px solid #e74c3c;
+    background-color: #fdf2f2;
+}
+
+/* Code inline styling */
+.rst-content code.literal {
+    background-color: #f8f9fa;
+    color: #e74c3c;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-weight: 600;
+}
