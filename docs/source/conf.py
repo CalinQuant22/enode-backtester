@@ -11,7 +11,7 @@ import sys
 #   backtester/
 #   docs/
 #       source/conf.py   <-- this file
-sys.path.insert(0, os.path.abspath("../../.."))
+sys.path.insert(0, os.path.abspath("../.."))
 
 
 # -- Project information -----------------------------------------------------
