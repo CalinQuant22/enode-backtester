@@ -1,9 +1,7 @@
-enode-backtester
-================
+API Reference
+=============
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
 
    backtester
-   my_strategies
-   test

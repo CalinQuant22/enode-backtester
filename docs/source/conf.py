@@ -50,6 +50,16 @@ napoleon_use_rtype = True
 # Autodoc settings
 autodoc_member_order = "bysource"
 autodoc_typehints = "description"
+autodoc_default_options = {
+    'members': True,
+    'member-order': 'bysource',
+    'special-members': '__init__',
+    'undoc-members': True,
+    'exclude-members': '__weakref__'
+}
+
+# Mock imports for modules that might not be available during doc build
+autodoc_mock_imports = ['pandas', 'numpy', 'pyfolio', 'pydantic']
 
 
 # -- Options for HTML output -------------------------------------------------

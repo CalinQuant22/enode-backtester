@@ -124,12 +124,30 @@ dependencies = [
     { name = "sphinxcontrib-napoleon" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "myst-parser" },
+    { name = "sphinx" },
+    { name = "sphinx-autodoc-typehints" },
+    { name = "sphinx-rtd-theme" },
+    { name = "sphinxcontrib-napoleon" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "enode-quant", specifier = ">=0.1.8" },
     { name = "myst-parser", specifier = ">=4.0.1" },
     { name = "pandas", specifier = ">=2.0.0" },
     { name = "pydantic", specifier = ">=2.0.0" },
+    { name = "sphinx", specifier = ">=8.2.3" },
+    { name = "sphinx-autodoc-typehints", specifier = ">=3.5.2" },
+    { name = "sphinx-rtd-theme", specifier = ">=3.0.2" },
+    { name = "sphinxcontrib-napoleon", specifier = ">=0.7" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "myst-parser", specifier = ">=4.0.1" },
     { name = "sphinx", specifier = ">=8.2.3" },
     { name = "sphinx-autodoc-typehints", specifier = ">=3.5.2" },
     { name = "sphinx-rtd-theme", specifier = ">=3.0.2" },
