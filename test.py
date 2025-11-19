@@ -2,6 +2,7 @@ import pandas as pd
 import backtester
 from my_strategies import MovingAverageCrossStrategy
 from backtester.sizer import FixedSizeSizer
+from backtester import RiskManager, MaxPositionSizeRule, MaxCashUsageRule, MaxPositionCountRule, analyze_strategy
 
 # Import your library's data fetcher
 from enode_quant.api.candles import get_stock_candles
@@ -13,23 +14,21 @@ def fetch_data_from_db():
     print("--- Fetching Data from RDS ---")
     
     tickers = ['AAPL', 'GOOGL']
-    # Adjusted to your date range
     start_date = '2025-01-01'
     end_date = '2025-11-10' 
-    resolution = 'H' # Based on your successful test
+    resolution = 'H'
     
     data_dict = {}
 
     for symbol in tickers:
         print(f"Fetching {symbol}...")
         try:
-            # Use your library to get the DataFrame directly
             df = get_stock_candles(
                 symbol=symbol,
                 resolution=resolution,
                 start_date=start_date,
                 end_date=end_date,
-                limit=5000, # Ensure we get enough rows
+                limit=5000,
                 as_dataframe=True
             )
             
@@ -37,8 +36,6 @@ def fetch_data_from_db():
                 print(f"WARNING: No data returned for {symbol}")
                 continue
                 
-            # Ensure 'symbol' column exists for the Pydantic model
-            # Your query builder likely adds it, but good to be safe
             if 'symbol' not in df.columns:
                 df['symbol'] = symbol
             
@@ -59,33 +56,78 @@ if __name__ == "__main__":
         print("CRITICAL: No data loaded. Exiting.")
         exit()
     
-    # 2. Run the backtest using your simple wrapper
-    print("\n--- Starting Backtest ---")
-    results = backtester.run_backtest(
+    # 2. Run backtest WITHOUT risk management
+    print("\n--- Backtest WITHOUT Risk Management ---")
+    results_no_risk = backtester.run_backtest(
         data_dict=data,
         strategy_class=MovingAverageCrossStrategy,
         initial_cash=100_000.0,
-        sizer=FixedSizeSizer(10) # Buy 10 shares per signal
+        sizer=FixedSizeSizer(100)  # Larger size to show risk impact
     )
     
-    # 3. Analyze Results
-    print("\n--- Analysis Results ---")
+    # 3. Run backtest WITH risk management
+    print("\n--- Backtest WITH Risk Management ---")
+    risk_manager = RiskManager([
+        MaxPositionSizeRule(max_position_pct=0.15),  # Max 15% per position
+        MaxCashUsageRule(reserve_cash=5000.0),       # Keep $5k reserve
+        MaxPositionCountRule(max_positions=5)        # Max 5 positions
+    ])
     
-    # Get the trade log
-    trade_log = backtester.get_trade_log_df(results)
+    results_with_risk = backtester.run_backtest(
+        data_dict=data,
+        strategy_class=MovingAverageCrossStrategy,
+        initial_cash=100_000.0,
+        sizer=FixedSizeSizer(100),
+        risk_manager=risk_manager
+    )
     
-    if not trade_log.empty:
-        print(f"Total Trades: {len(trade_log)}")
-        print("\nRecent Trades:")
-        print(trade_log.tail())
-        
-        # Calculate simple total return
-        final_value = results.equity_curve[-1][1]
-        pnl = final_value - 100_000
-        print(f"\nFinal Portfolio Value: ${final_value:,.2f}")
-        print(f"Total P&L: ${pnl:,.2f}")
-    else:
-        print("No trades were made. Check strategy logic or data.")
-
-    # Optional: Generate full Pyfolio report
-    # backtester.generate_full_tear_sheet(results)
+    # 4. Compare Results
+    print("\n=== COMPARISON ===")
+    
+    trade_log_no_risk = backtester.get_trade_log_df(results_no_risk)
+    trade_log_with_risk = backtester.get_trade_log_df(results_with_risk)
+    
+    final_no_risk = results_no_risk.equity_curve[-1][1]
+    final_with_risk = results_with_risk.equity_curve[-1][1]
+    
+    print(f"WITHOUT risk: ${final_no_risk:,.2f} | {len(trade_log_no_risk)} trades | Cash: ${results_no_risk.current_cash:,.2f}")
+    print(f"WITH risk:    ${final_with_risk:,.2f} | {len(trade_log_with_risk)} trades | Cash: ${results_with_risk.current_cash:,.2f}")
+    
+    pnl_no_risk = final_no_risk - 100_000
+    pnl_with_risk = final_with_risk - 100_000
+    
+    print(f"\nP&L WITHOUT risk: ${pnl_no_risk:,.2f} ({pnl_no_risk/100_000*100:.1f}%)")
+    print(f"P&L WITH risk:    ${pnl_with_risk:,.2f} ({pnl_with_risk/100_000*100:.1f}%)")
+    
+    # 5. Advanced Metrics Analysis
+    print("\n--- Advanced Metrics Analysis ---")
+    metrics, monte_carlo = analyze_strategy(results_with_risk)
+    
+    print(f"Sharpe Ratio: {metrics.sharpe_ratio:.2f} (CI: [{metrics.sharpe_confidence_interval[0]:.2f}, {metrics.sharpe_confidence_interval[1]:.2f}])")
+    print(f"Sortino Ratio: {metrics.sortino_ratio:.2f}")
+    print(f"Max Drawdown: {metrics.max_drawdown:.2%}")
+    print(f"Win Rate: {metrics.win_rate:.1%}")
+    print(f"Profit Factor: {metrics.profit_factor:.2f}")
+    print(f"VaR (95%): {metrics.var_95:.2%}")
+    
+    if "probability_of_loss" in monte_carlo:
+        print(f"\nMonte Carlo Analysis:")
+        print(f"Probability of Loss: {monte_carlo['probability_of_loss']:.1%}")
+        print(f"Expected Range (25%-75%): ${monte_carlo['final_value_percentiles']['25%']:,.0f} - ${monte_carlo['final_value_percentiles']['75%']:,.0f}")
+    
+    if not trade_log_with_risk.empty:
+        print("\nRisk-managed trades:")
+        print(trade_log_with_risk.tail())
+    
+    print("\n✅ Comprehensive backtest completed!")
+    # 6. Save Results for Dashboard
+    print("\n--- Saving Results ---")
+    from backtester.dashboard.loaders import save_results
+    
+    # Save as JSON (lightweight, shareable)
+    save_results(results_with_risk, metrics, monte_carlo, "backtest_results.json")
+    print("✅ Results saved to backtest_results.json")
+    
+    print("\n🚀 Launch dashboard with:")
+    print("   uv run python -m backtester.cli dashboard backtest_results.json")
+    print("   Or: uv run python -m backtester.cli analyze backtest_results.json")

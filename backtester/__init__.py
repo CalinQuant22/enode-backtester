@@ -39,6 +39,16 @@ from typing import Type, Callable, Optional
 import pandas as pd
 
 from .analysis import generate_full_tear_sheet, get_trade_log_df
+from .metrics import analyze_strategy, StrategyAnalyzer, PerformanceMetrics
+
+# Optional dashboard imports (requires dash)
+try:
+    from .dashboard import create_app, launch_dashboard
+    _DASHBOARD_AVAILABLE = True
+except ImportError:
+    _DASHBOARD_AVAILABLE = False
+    create_app = None
+    launch_dashboard = None
 from .data import DataFrameDataHandler
 from .engine import BacktestEngine
 from .execution import (
@@ -169,6 +179,11 @@ __all__ = [
     "run_backtest",
     "generate_full_tear_sheet", 
     "get_trade_log_df",
+    "analyze_strategy",
+    "StrategyAnalyzer",
+    "PerformanceMetrics",
+    "create_app",
+    "launch_dashboard",
     "FixedSizeSizer",
     "BaseStrategy",
     "BaseSizer",
