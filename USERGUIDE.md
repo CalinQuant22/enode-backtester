@@ -50,14 +50,14 @@ Market Data → Strategy → Signals → Portfolio → Orders → Execution → 
 
 ### Using uv (Recommended)
 ```bash
-git clone <repository-url>
+git clone https://github.com/CalinQuant22/enode-backtester
 cd enode-backtester
 uv sync
 ```
 
 ### Using pip
 ```bash
-git clone <repository-url>
+git clone https://github.com/CalinQuant22/enode-backtester
 cd enode-backtester
 pip install -r requirements.txt
 ```
