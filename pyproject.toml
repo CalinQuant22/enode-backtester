@@ -1,9 +1,23 @@
 [project]
 name = "enode-backtester"
 version = "0.1.0"
-description = "Add your description here"
+description = "Event-driven backtesting framework for trading strategies"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "pandas>=2.0.0",
+    "pydantic>=2.0.0",
     "enode-quant>=0.1.8",
+    "myst-parser>=4.0.1",
+    "sphinx>=8.2.3",
+    "sphinx-autodoc-typehints>=3.5.2",
+    "sphinx-rtd-theme>=3.0.2",
+    "sphinxcontrib-napoleon>=0.7",
 ]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
