@@ -41,6 +41,50 @@ import pandas as pd
 from .analysis import generate_full_tear_sheet, get_trade_log_df
 from .metrics import analyze_strategy, StrategyAnalyzer, PerformanceMetrics
 
+class BacktestResult:
+    """Wrapper for backtest results with convenience methods."""
+    
+    def __init__(self, portfolio):
+        self.portfolio = portfolio
+        self._metrics = None
+        self._monte_carlo = None
+    
+    @property
+    def metrics(self):
+        """Lazy-load performance metrics."""
+        if self._metrics is None:
+            self._metrics, self._monte_carlo = analyze_strategy(self.portfolio)
+        return self._metrics
+    
+    @property
+    def monte_carlo(self):
+        """Lazy-load Monte Carlo analysis."""
+        if self._monte_carlo is None:
+            self._metrics, self._monte_carlo = analyze_strategy(self.portfolio)
+        return self._monte_carlo
+    
+    def dashboard(self, port: int = 8050, save: bool = False):
+        """Launch interactive dashboard."""
+        if not _DASHBOARD_AVAILABLE:
+            raise ImportError("Dashboard requires: pip install dash plotly dash-bootstrap-components")
+        
+        if save:
+            self.save("backtest_results.json")
+        
+        launch_dashboard(portfolio=self.portfolio, port=port)
+        return self
+    
+    def save(self, filename: str = "backtest_results.json"):
+        """Save results to JSON file."""
+        from .dashboard.loaders import save_results
+        save_results(self.portfolio, self.metrics, self.monte_carlo, filename)
+        print(f"💾 Results saved to {filename}")
+        return self
+    
+    def __getattr__(self, name):
+        """Delegate to portfolio for backward compatibility."""
+        return getattr(self.portfolio, name)
+
 # Optional dashboard imports (requires dash)
 try:
     from .dashboard import create_app, launch_dashboard
@@ -78,7 +122,7 @@ def run_backtest(
     risk_manager: Optional[RiskManager] = None,
     commission_model: Optional[Callable] = None,
     slippage_model: Optional[Callable] = None,
-) -> Portfolio:
+) -> BacktestResult:
     """Execute a complete backtesting simulation.
     
     This is the main entry point for running backtests. It instantiates all
@@ -171,7 +215,7 @@ def run_backtest(
     final_portfolio = engine.run()
 
     print("--- Backtest Complete. Returning results. ---")
-    return final_portfolio
+    return BacktestResult(final_portfolio)
 
 
 # Public API exports

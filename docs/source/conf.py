@@ -27,6 +27,7 @@ release = "0.1.0"
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
+    "sphinx.ext.mathjax",
     "sphinx_autodoc_typehints",
     "myst_parser",
 ]
@@ -59,7 +60,11 @@ autodoc_default_options = {
 }
 
 # Mock imports for modules that might not be available during doc build
-autodoc_mock_imports = ['pandas', 'numpy', 'pyfolio', 'pydantic']
+autodoc_mock_imports = [
+    'pandas', 'numpy', 'pyfolio', 'pydantic',
+    'dash', 'plotly', 'dash_bootstrap_components',
+    'plotly.graph_objects', 'plotly.express'
+]
 
 
 # -- Options for HTML output -------------------------------------------------

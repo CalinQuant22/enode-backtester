@@ -35,6 +35,16 @@ def save_results(portfolio, metrics, monte_carlo, filepath: str):
                 {'timestamp': str(ts), 'equity': float(eq)} 
                 for ts, eq in portfolio.equity_curve
             ],
+            'trade_log': [
+                {
+                    'symbol': trade.symbol,
+                    'timestamp': str(trade.timestamp),
+                    'quantity': trade.quantity,
+                    'fill_price': trade.fill_price,
+                    'signal': trade.signal
+                }
+                for trade in portfolio.trade_log
+            ],
             'trade_count': len(portfolio.trade_log),
             'final_cash': portfolio.current_cash,
         }
@@ -95,8 +105,20 @@ class MockPortfolio:
             (item['timestamp'], item['equity']) 
             for item in data['equity_curve']
         ]
-        self.trade_log = []  # Simplified for JSON
+        self.trade_log = [
+            MockTrade(trade_data) for trade_data in data.get('trade_log', [])
+        ]
         self.current_cash = data.get('final_cash', 0)
+
+class MockTrade:
+    """Mock trade object for JSON-loaded data."""
+    
+    def __init__(self, data):
+        self.symbol = data['symbol']
+        self.timestamp = data['timestamp']
+        self.quantity = data['quantity']
+        self.fill_price = data['fill_price']
+        self.signal = data['signal']
 
 class MockMetrics:
     """Mock metrics object for JSON-loaded data."""

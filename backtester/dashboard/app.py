@@ -11,7 +11,7 @@ from .loaders import load_results
 # Set default plotly theme
 pio.templates.default = "plotly_dark"
 
-def create_app(results_path: str = None):
+def create_app(results_path: str = None, portfolio=None, metrics=None, monte_carlo=None):
     """Create and configure Dash app."""
     
     app = dash.Dash(__name__, external_stylesheets=[
@@ -144,8 +144,12 @@ def create_app(results_path: str = None):
     </html>
     '''
     
-    # Load results if path provided
-    if results_path:
+    # Load results from path or use direct objects
+    if portfolio and metrics and monte_carlo:
+        # Direct objects provided - no JSON needed
+        app.layout = create_layout(portfolio, metrics, monte_carlo)
+    elif results_path:
+        # Load from JSON file
         portfolio, metrics, monte_carlo = load_results(results_path)
         app.layout = create_layout(portfolio, metrics, monte_carlo)
     else:
@@ -163,15 +167,13 @@ def launch_dashboard(portfolio=None, results_path: str = None, port: int = 8050,
     """Launch dashboard server."""
     
     if portfolio and not results_path:
-        # Save portfolio temporarily
-        from .loaders import save_results
+        # Use direct objects - no JSON needed!
         from ..metrics import analyze_strategy
-        
         metrics, monte_carlo = analyze_strategy(portfolio)
-        results_path = "temp_results.json"
-        save_results(portfolio, metrics, monte_carlo, results_path)
-    
-    app = create_app(results_path)
+        app = create_app(portfolio=portfolio, metrics=metrics, monte_carlo=monte_carlo)
+    else:
+        # Load from JSON file
+        app = create_app(results_path=results_path)
     
     print(f"🚀 Dashboard starting at http://localhost:{port}")
     app.run(debug=debug, port=port, host="0.0.0.0")

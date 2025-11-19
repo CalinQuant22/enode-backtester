@@ -92,6 +92,7 @@ class Portfolio(BasePortfolio):
         # Performance tracking
         self.equity_curve = []  # [(timestamp, total_equity), ...]
         self.trade_log = []  # [FillEvent, ...]
+        self._last_equity_timestamp = None  # Track last recorded timestamp
 
     def on_stock_event(self, event: StockEvent) -> None:
         """Update position valuations and record equity when new market data arrives.
@@ -131,13 +132,15 @@ class Portfolio(BasePortfolio):
             timestamp: When this equity measurement was taken
         
         Note:
-            The equity curve is the primary output for performance analysis.
-            It's used by the analysis module to calculate returns, Sharpe ratio,
-            maximum drawdown, and other performance metrics.
+            Only records equity once per unique timestamp to avoid duplicates
+            when multiple symbols update on the same date.
         """
-        total_holdings = sum(self.current_holdings_value.values())
-        total_equity = self.current_cash + total_holdings
-        self.equity_curve.append((timestamp, total_equity))
+        # Only record equity once per timestamp
+        if self._last_equity_timestamp != timestamp:
+            total_holdings = sum(self.current_holdings_value.values())
+            total_equity = self.current_cash + total_holdings
+            self.equity_curve.append((timestamp, total_equity))
+            self._last_equity_timestamp = timestamp
 
     def on_signal_event(self, event: SignalEvent) -> None:
         """Convert a trading signal into a sized order with risk validation.
@@ -228,3 +231,22 @@ class Portfolio(BasePortfolio):
         
         # Record the trade for analysis
         self.trade_log.append(event)
+    
+    def dashboard(self, port: int = 8050, save_results: bool = False):
+        """Launch interactive dashboard for this portfolio.
+        
+        Args:
+            port: Port to run dashboard on
+            save_results: Whether to save results to JSON file
+        """
+        from .dashboard.app import launch_dashboard
+        
+        if save_results:
+            from .dashboard.loaders import save_results as save_fn
+            from .metrics import analyze_strategy
+            
+            metrics, monte_carlo = analyze_strategy(self)
+            save_fn(self, metrics, monte_carlo, "backtest_results.json")
+            print("💾 Results saved to backtest_results.json")
+        
+        launch_dashboard(portfolio=self, port=port)

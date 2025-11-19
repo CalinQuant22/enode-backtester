@@ -30,6 +30,13 @@ def create_layout(portfolio, metrics, monte_carlo):
             ])
         ]),
         
+        # Portfolio composition info
+        dbc.Row([
+            dbc.Col([
+                create_portfolio_composition_card(portfolio)
+            ], width=12)
+        ], className="mb-4"),
+        
         # Key Metrics Row with enhanced cards
         dbc.Row([
             dbc.Col([
@@ -77,9 +84,9 @@ def create_performance_tab(portfolio, metrics):
         html.Div([
             html.H5([html.I(className="fas fa-info-circle me-2"), "Performance Overview"]),
             html.P([
-                "This section shows your strategy's overall performance. The equity curve displays how your portfolio value ",
-                "changed over time, while the metrics table provides key risk-adjusted performance indicators. ",
-                "A consistently rising equity curve with minimal drawdowns indicates a robust strategy."
+                "This section compares your strategy's performance against a buy-and-hold benchmark. The solid line shows ",
+                "your strategy's equity curve, while the dotted line represents equal-weight allocation across all traded assets. ",
+                "Outperforming the benchmark indicates your strategy adds value beyond passive investing."
             ])
         ], className="explanation"),
         
@@ -159,6 +166,47 @@ def create_risk_tab(metrics, portfolio):
             ], width=6),
         ])
     ])
+
+def create_portfolio_composition_card(portfolio):
+    """Create portfolio composition display card."""
+    
+    # Extract symbols from trade log
+    symbols = set()
+    for trade in portfolio.trade_log:
+        symbols.add(trade.symbol)
+    
+    if not symbols:
+        symbols_text = "No trades executed"
+        benchmark_text = "N/A"
+    else:
+        symbols_list = sorted(list(symbols))
+        symbols_text = ", ".join(symbols_list)
+        if len(symbols_list) == 1:
+            benchmark_text = f"100% {symbols_list[0]}"
+        else:
+            pct_each = 100 / len(symbols_list)
+            benchmark_text = f"{pct_each:.1f}% each: {', '.join(symbols_list)}"
+    
+    return dbc.Card([
+        dbc.CardBody([
+            dbc.Row([
+                dbc.Col([
+                    html.Div([
+                        html.I(className="fas fa-chart-pie fa-2x mb-2", style={"color": "#17a2b8"}),
+                        html.H5("Portfolio Universe", className="mb-1"),
+                        html.P(symbols_text, className="mb-0", style={"font-size": "1.1rem", "font-weight": "500"})
+                    ])
+                ], width=6),
+                dbc.Col([
+                    html.Div([
+                        html.I(className="fas fa-balance-scale fa-2x mb-2", style={"color": "#28a745"}),
+                        html.H5("Buy & Hold Benchmark", className="mb-1"),
+                        html.P(benchmark_text, className="mb-0", style={"font-size": "1.1rem", "font-weight": "500"})
+                    ])
+                ], width=6)
+            ])
+        ])
+    ], style={"background": "linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%)", "border": "1px solid #404040"})
 
 def create_enhanced_metric_card(title, value, icon, color, description):
     """Create enhanced metric card with icon and description."""

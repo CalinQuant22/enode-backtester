@@ -84,6 +84,60 @@ backtester.strategy module
    :show-inheritance:
    :undoc-members:
 
+backtester.cli module
+---------------------
+
+.. automodule:: backtester.cli
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+backtester.metrics module
+-------------------------
+
+.. automodule:: backtester.metrics
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+backtester.dashboard package
+----------------------------
+
+Submodules
+~~~~~~~~~~
+
+backtester.dashboard.app module
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. automodule:: backtester.dashboard.app
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+backtester.dashboard.layout module
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. automodule:: backtester.dashboard.layout
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+backtester.dashboard.plots module
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. automodule:: backtester.dashboard.plots
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+backtester.dashboard.components module
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. automodule:: backtester.dashboard.components
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 Module contents
 ---------------
 

@@ -10,3 +10,5 @@ wheels/
 .venv
 test.py
 my_strategies.py
+test_dashboard.py
+test_library.py
